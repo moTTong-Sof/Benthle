@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block title %}Play{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link href="/static/css/loading_screen.css" rel="stylesheet">
+    <link href="/static/css/game.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div id="loading-overlay">
+        <div class="benthle-load loading-message pulsate-fwd"><p class="loading-message">BENTHLE</p><div class="bg-benthle-load"></div></div>
+        <div id="loading-map">
+            <div id="tile-1" class="loading-tile"></div>    
+            <div id="tile-2" class="loading-tile"></div>
+            <div id="tile-3" class="loading-tile"></div>
+        </div>
+    </div>
+
+    <div class="exit-game" style="display: none;"><a href="/homepage"><i class="fa-solid fa-circle-xmark fa-lg" style="color: darkslategrey;"></i></a></div>
+    <div class="next-game" style="display: none;">
+        <button class="next-game" onclick="location.href='{{ url_for('complete_exercise', exercise_number=current_exercise) }}'">NEXT LEVEL<i class="fa-solid fa-diagram-next"></i></button>
+    </div>
+
+    <div id="combined-map" style="display: none;">
+
+        <div id="map">
+            <h1 class="title score"> SCORE : 0 </h1>
+
+            <div class="grid-container" id="grid-container">
+                
+            </div>
+        </div>
+
+        <div id="colorscale">
+            <img id="colorbar" src="" alt="colorscale">
+        </div>
+
+    </div>
+
+    <div class="pop-up max-depth">
+        <p class="text-max-depth depth">DEEPEST TILE</p>
+        <p class="text-max-depth depth">-2 points</p>
+    </div>
+
+    <div class="pop-up min-depth">
+        <p class="text-min-depth depth">SHALLOWEST TILE</p>
+        <p class="text-min-depth depth">-2 points</p></div><div class="pop-up min-depth">
+    </div>
+
+    <script>
+        var difficulty = "{{ difficulty }}";
+    </script>
+    <script src="static/js/game.js"></script>
+
+<!--
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var scaleIn = "scale-in-center";
+        var bgLoading = "bg-loading"
+
+        function resetLoading() {
+            $('.loading-tile').removeClass(bgLoading).removeClass(scaleIn);
+
+            setTimeout(function() {
+                // Add a small delay to make the 1st tile disappear
+                loadingScreenLogic();
+            }, 100);
+        }
+
+        function loadingScreenLogic() {
+            var totalTiles = $(".loading-tile").length;
+            console.log(totalTiles);
+
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function animateTiles() {
+                for (let currentTile = 1; currentTile <= totalTiles; currentTile++) {
+                    $("#tile-" + currentTile).addClass(scaleIn).addClass(bgLoading);
+                    await delay(800);
+                }
+
+                await delay(400);
+                resetLoading();
+            }
+
+            animateTiles();
+        }
+
+        loadingScreenLogic();
+    });
+</script>
+-->
+
+{% endblock %}

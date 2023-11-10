@@ -1,0 +1,8 @@
+# gitignore
+
+__pycache__
+env
+test.py
+templates/previous_versions
+static/css/previous_versions
+static/images/bathymetry_background.png

@@ -1,0 +1,87 @@
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 2em;
+    /* height: 80vh; */
+    /* background-color: #fffafa;*/
+}
+
+main::-webkit-scrollbar{
+    display: none;
+}
+
+.chose {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2em auto 3em;
+    max-width: 350px;
+    text-align: justify;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.tuto-intro {
+    /* font-size: 1.1em; */
+    background: #100d61;
+    padding: 1em;
+    border-radius: 20px;
+    color: snow;
+    opacity: 0.95;
+}
+
+h4.play-title {
+    margin: 0 auto -0.5em;
+    color: #100d61;
+    padding: 0 0 0.5em;
+    border-bottom: 1px solid #100d61;
+    width: 65%;
+    text-align: center;
+}
+
+button {
+    background-size: cover;
+    background-position: center;
+    color: snow;
+    font-size: 3em;
+    letter-spacing: 0.2em;
+    margin: 0.15em auto;
+    border-radius: 20px;
+    border: none;
+    width: 350px;
+    height: 80px;
+    cursor: pointer;
+}
+
+.locker {
+    margin: 0.5em;
+    color:#100d61;
+}
+
+/* 
+button[value="tutorial"] {
+    background-image: url('https://www.africasurveyorsonline.com/wp-content/uploads/2023/02/Hexagon_AP_MultibeamBathymetry-1680x885-1-e1675592688456.jpg');
+    background-position: 50% 70%;
+    height: 100px;
+    letter-spacing: 0.05em;
+}
+
+button[value="tutorial"] i {
+    margin: 0 0 0 0.5em;
+} */
+
+button[value="easy"] {
+    background-image: url('https://www.whoi.edu/wp-content/uploads/2016/06/call_463974-1-400x190.jpg');
+}
+
+button[value="medium"] {
+    background-image: url('https://www.whoi.edu/wp-content/uploads/2022/04/Dragonfish-400x190.jpg');
+}
+
+button[value="hard"] {
+    background-image: url('https://www.whoi.edu/wp-content/uploads/2019/10/Orpheus-underwater-400x190.jpg');
+}

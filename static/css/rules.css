@@ -1,0 +1,49 @@
+
+/* RULES */
+.rules-intro {
+    display: flex;
+    background: #100d61;
+    color: snow;
+    border-radius: 10px;
+    align-items: center;
+    padding: 0 0 0 2.5em;
+}
+
+.title {
+    font-size: 1.5em;
+    margin: 1em auto;
+    width: 10em;
+    padding: 0.5em;
+    border-radius: 10px;
+    border: 1px snow solid;
+    text-align: center;
+    background: #100d61;
+    color: snow;
+}
+
+.pop-up {
+    margin: 1em 1em -1em;
+    color: snow;
+    text-align: justify;
+    background: #100d61;
+    border-radius: 20px;
+    padding: 1.5em;
+    opacity: 0.95;
+}
+
+.exit-game {
+    float: right;
+    margin: -0.5em -0.5em 0 0;
+    font-size: 120%;
+}
+
+.bold {
+    font-weight: bold;
+    text-align: center;
+}
+
+.blur {
+    filter: blur(5px);
+    pointer-events: none;
+}
+
