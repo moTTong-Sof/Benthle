@@ -40,6 +40,11 @@ nav {
     margin: 1.5em auto 0.5em;
 }
 
+.nav-deactivated {
+    opacity: 0.5;
+    pointer-events: none; 
+}
+
 .benthle-nav {
     position: relative;
     margin: 1em 0 0 0.2em;

@@ -15,7 +15,7 @@ $(document).ready(function () {
         //if (route === 'tutorial') {
           //  window.location.href = '/tutorial';
         //} else {
-            window.location.href = route;
+            window.location.href = '/homepage';
         //}
     }, 5500);
 

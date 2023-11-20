@@ -1,11 +1,28 @@
 from flask import Flask, request, session, render_template, redirect, url_for, jsonify
-from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image, load_map_data
+from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image, load_map_data, get_user_stats, update_user_stats
+
+from flask_sqlalchemy import SQLAlchemy
+from database import db
 
 import random
 import json
+import uuid
+
+
 
 app = Flask(__name__)
-app.secret_key = 'Pacola'
+app.secret_key = 'pacola'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///benthle.db'
+
+
+
+with app.app_context():
+    db.init_app(app)
+    from models import Userdata, Tempdata
+    db.create_all()
+    db.session.commit()
+
+
 
 """ Global variables """
 # Longitude & latitude boundaries of complete dataset (url = https://erddap.emodnet.eu/erddap/griddap/bathymetry_2022.html)
@@ -16,15 +33,18 @@ DB_BOUNDARIES = {
     'max_lon': 42.999479166657686,
 }
 
-# Jsonfile for storing our maps informations
+# Jsonfile for storing our maps informations & difficulties
 json_file_path = 'stored_maps.json'
+valid_difficulties = ['easy', 'medium', 'hard']
+""" Global variables """
+
 
 
 @app.route("/generate_maps", methods=["GET"])
 def generate_and_save_maps():
-
     requested_difficulties = request.args.getlist('difficulty')
-    valid_difficulties = ['easy', 'medium', 'hard']
+    global valid_difficulties
+
     if requested_difficulties:
         difficulties_to_generate = [d for d in requested_difficulties if d in valid_difficulties]
     else:
@@ -49,7 +69,7 @@ def generate_and_save_maps():
 
         # Determine map boundaries, print url and generate colorscale
         map_boundaries = get_map_boundaries(DB_BOUNDARIES)
-        colorscale = generate_url_and_colorscale(map_boundaries)
+        full_url, colorscale = generate_url_and_colorscale(map_boundaries)
 
         # Divide map in zones and identify deepest/shallowest zones + playability of the map
         map_zones = create_map_zones(map_boundaries, grid_width)
@@ -59,6 +79,7 @@ def generate_and_save_maps():
         elevation_threshold = 0.8
         if playability < elevation_threshold:
             print("-- Not playable. Restarting --")
+            # if it is the 1st map, it will forget about the two other ones // we have to handle this
             return redirect(url_for('generate_and_save_maps', difficulty=difficulty))
 
         else:
@@ -77,6 +98,7 @@ def generate_and_save_maps():
 
             # Condense all informations into a dict
             map_data = {
+                'full_url' : full_url,
                 'map_zones' : map_zones,
                 'colorscale' : colorscale,
                 'grid_width' : grid_width,
@@ -92,13 +114,37 @@ def generate_and_save_maps():
     with open(json_file_path, 'w') as f:
         json.dump(maps, f)
 
-    return "Maps generated and saved successfully!"
+    tempdata_entries = Tempdata.query.all()
+    for entry in tempdata_entries:
+        entry.reset_fields()
+    db.session.commit()
+
+    return render_template('homepage.html')
+
+
+@app.before_request
+def redirect_to_landing():
+    if 'user_id' not in session and request.endpoint != 'landing':
+        return redirect(url_for('landing'))
+
 
 
 @app.route("/", methods=['GET', 'POST'])
 def landing():
-    route = 'homepage'
-    return render_template('landing.html', route=route)
+
+    if 'user_id' not in session:
+        session['user_id'] = str(uuid.uuid4())
+        new_user = Userdata(session['user_id'], None, 0, 0, 0, 0, 0, 0)
+        db.session.add(new_user)
+
+        new_user_temp = Tempdata(new_user.id, 0, 0, 0, 0)
+        db.session.add(new_user_temp)
+        db.session.commit()
+        
+        print(new_user)
+        print(new_user_temp)
+    
+    return render_template('landing.html')
 
 
 @app.route("/leaderboard")
@@ -113,27 +159,18 @@ def tutorial():
 
 @app.route("/homepage", methods=["GET", "POST"])
 def homepage():
-    # Tracking current exercise for difficulty progression
+
     if request.method == "POST":
         difficulty = request.form.get('difficulty')
-        if difficulty == 'easy':
-            curr_ex = 1
-        elif difficulty == 'medium':
-            curr_ex= 2
-        elif difficulty == 'hard':
-            curr_ex = 3
-        return redirect(f"/game?difficulty={difficulty}&curr_ex={curr_ex}")
+        return redirect(f"/game?difficulty={difficulty}")
 
-    highest_completed_exercise = session.get('highest_completed_exercise', 0)
-
-    return render_template('homepage.html', highest_completed_exercise=highest_completed_exercise)
+    return render_template('homepage.html')
 
 
 @app.route("/game")
 def game():
     difficulty = request.args.get('difficulty', 'easy')
-    curr_ex = request.args.get('curr_ex', 1, type=int)
-    return render_template('game.html', current_exercise=curr_ex, difficulty=difficulty)
+    return render_template('game.html', difficulty=difficulty)
 
 
 @app.route("/game/data")
@@ -143,11 +180,60 @@ def game_data():
     return jsonify(map_data)
 
 
-# Route to handle exercise completion
-@app.route('/complete_exercise/<int:exercise_number>', methods=['GET'])
-def complete_exercise(exercise_number):
-    session['highest_completed_exercise'] = max(exercise_number, session.get('highest_completed_exercise', 0))
-    return redirect(url_for('homepage'))
+@app.route('/update_database', methods=['GET', 'POST'])
+def update_database():
+    
+    if request.method == 'GET':
+        stat_name = request.args.get('stat')
+        print(stat_name)
+        table_arg = request.args.get('table')
+
+        if stat_name == 'all':
+            if table_arg == 'Tempdata':
+                instances = Tempdata.query.filter_by(user_id=session['user_id']).all()
+            else:
+                instances = Userdata.query.filter_by(id=session['user_id']).all()
+
+            serialized_data = [instance.serialize() for instance in instances]
+            response = {'status': 'success', 'data': serialized_data}
+        else:
+            if table_arg == 'Tempdata':
+                instance = Tempdata.query.filter_by(user_id=session['user_id']).first()
+            else:
+                instance = Userdata.query.filter_by(id=session['user_id']).first()
+
+            value = getattr(instance, stat_name, None)
+            if isinstance(value, bool):
+                value = str(value).lower()
+            print(value)
+            response = {'status': 'success', 'data': value}
+            print(response)
+
+    elif request.method == 'POST': 
+        stat_name = request.args.get('stat')
+        value = request.args.get('value')
+        table_arg = request.args.get('table')
+
+        if value.lower() == 'true':
+            value = True
+        elif value.lower() == 'false':
+            value = False
+
+        if table_arg == 'Tempdata':
+            instance = Tempdata.query.filter_by(user_id=session['user_id']).first()
+        else:
+            instance = Userdata.query.filter_by(id=session['user_id']).first()
+        print(instance)
+        setattr(instance, stat_name, value)
+        db.session.commit()
+        updated_value = getattr(instance, stat_name, None)
+        print(updated_value)
+        response = {'status': 'success', 'data': updated_value}
+
+    else:
+        response = {'status': 'error', 'message': 'Invalid request method'}
+
+    return jsonify(response)
 
 
 if __name__ == '__main__':

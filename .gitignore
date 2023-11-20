@@ -5,4 +5,7 @@ env
 test.py
 templates/previous_versions
 static/css/previous_versions
+static/js/previous_versions
+static/js/playerStats.js
 static/images/bathymetry_background.png
+instance

@@ -1,7 +1,7 @@
 main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
     align-items: center;
     margin: 0 auto 2em;
     /* height: 80vh; */
@@ -12,11 +12,19 @@ main::-webkit-scrollbar{
     display: none;
 }
 
+#choose-difficulty {
+    margin: 2em 0 0;
+}
+
+#linktuto:hover{
+    text-decoration: none;
+}
+
 .chose {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 2em auto 3em;
+    margin: 2em auto 1em;
     max-width: 350px;
     text-align: justify;
 }
@@ -58,8 +66,14 @@ button {
 }
 
 .locker {
+    display: none;
     margin: 0.5em;
     color:#100d61;
+}
+
+.disabled {
+    filter: blur(2px) grayscale(100%);
+    cursor: none;
 }
 
 /* 

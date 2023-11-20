@@ -10,20 +10,21 @@
 
 {% block content %}
 
-        
-    <div class="chose">
-        <p class="tuto-intro">First time in here ? Check the <span class="bold">tutorial <i style="width: 20px" class="fa-solid fa-graduation-cap"></i></span> to learn a bit more about bathymetry before diving into the BENTHLE !</p>
-        <!-- <button value="tutorial" onclick="location.href='/tutorial'">TUTORIAL</button> <i class="fa-solid fa-lightbulb"></i> -->
-    </div>
+    <a href="/tutorial" id="linktuto">
+        <div class="chose">
+            <p class="tuto-intro">First time in here ? Check the <span class="bold">tutorial <i style="width: 20px" class="fa-solid fa-graduation-cap"></i></span> to learn a bit more about bathymetry before diving into the BENTHLE !</p>
+        </div>
+    </a>
 
     <div id="choose-difficulty">
         <h4 class="play-title">Unlock the secrets of the benthic zone</h4>
         <form class="chose" method="post" action="{{ url_for('homepage') }}">
-            <button class="btn-loading" type="submit" name="difficulty" value="easy">BATHYAL</button>
-            <i {% if highest_completed_exercise >= 1 %}style="display: none;"{% endif %} class="fa-solid fa-lock locker"></i>
-            <button {% if highest_completed_exercise >= 1 %}enabled{% else %}disabled style="filter: blur(2px) grayscale(100%); cursor: none;"{% endif %} class="btn-loading" type="submit" name="difficulty" value="medium">ABYSSAL</button>
-            <i {% if highest_completed_exercise >= 2 or highest_completed_exercise < 1 %}style="display: none;"{% endif %} class="fa-solid fa-lock locker"></i>
-            <button {% if highest_completed_exercise >= 2 %}enabled{% else %}disabled style="filter: blur(2px) grayscale(100%); cursor: none;"{% endif %} class="btn-loading" type="submit" name="difficulty" value="hard">HADAL</button>
+            <button class="btn-loading locker0" type="submit" name="difficulty" value="easy">BATHYAL</button>
+            <i class="fa-solid fa-lock locker locker1"></i>
+            <button class="btn-loading locker1 disabled" disabled type="submit" name="difficulty" value="medium">ABYSSAL</button>
+            <i class="fa-solid fa-lock locker locker2"></i>
+            <button class="btn-loading locker2 disabled" type="submit" name="difficulty" value="hard">HADAL</button>
+            <i class="fa-solid fa-lock locker locker3"></i>
         </form>
     </div>
 
@@ -31,11 +32,8 @@
         <div class="exit-game"><i class="fa-solid fa-xmark fa-xl"></i></div>
         <h1 class="title">How to play</h1>
         <p>BENTHLE has <span class="bold">two main objectives</span> : finding the <span class="bold">deepest</span> AND the <span class="bold">shallowest</span> point on the map.</p>
-        <p>Each time you flip a tile, you score 1 point. When you flip one of the objectives, your score decrease by 2 points. The smaller your score, the better !</p>
-        <h1 class="title">Levels &amp; features</h1>
-        <p>BENTHLE's levels are named after the benthic zones. The "deeper" we go, the harder it gets. The bathyal zone is the easiest level, the abyssal zone is intermediate, and the hadal zone is the hardest.</p>
-        <p><span class="bold">Visible tiles:</span> Each level starts with a variable number of visible tiles, starting from 3 for the easiest level, down to 1 for the hardest.</p>
-        <p><span class="bold">Benthic wisdom:</span> When you flip a tile that is 1 tile away from the deepest or the shallowest point, a yellow flash will appear. On the last level, benthic wisdom is unavailable.</p>
+        <p>You start with 5 attempts. Each time you flip a tile, you loose 1 attempt. Remaining attempts are transfered to the next difficulty level.</p>
+        <p><span class="bold">Benthic wisdom:</span> When you flip a tile that is 1 tile away from the deepest or the shallowest point, a yellow flash will appear.</p>
     </div>
 
     <div class="pop-up" style="display: none;" id="my-maps">
@@ -47,46 +45,40 @@
     <div class="pop-up" style="display: none;" id="my-stats">
         <div class="exit-game"><i class="fa-solid fa-xmark fa-xl"></i></div>
         <h1 class="title">Statistics</h1>
-        <p>Feature not available yet</p>
+        <div class="stat-cell">
+            <p class="data" id="last-win-data">--</p>
+            <p class="data-title">LAST WIN</p>
+        </div>
+        <div class="stats global-stats">
+            <div class="stat-cell">
+                <p class="data" id="attempts-data">--</p>
+                <p class="data-title">TODAY'S ATTEMPTS</p>
+            </div>
+            <div class="stat-cell">
+                <p class="data" id="current-streak-data">--</p>
+                <p class="data-title">CURRENT STREAK</p>
+            </div>
+            <div class="stat-cell">
+                <p class="data" id="max-streak-data">--</p>
+                <p class="data-title">MAXIMUM STREAK</p>
+            </div>
+            <div class="stat-cell">
+                <p class="data" id="bathyal-data">--</p>
+                <p class="data-title">BATHYAL</p>
+            </div>
+            <div class="stat-cell">
+                <p class="data" id="abyssal-data">--</p>
+                <p class="data-title">ABYSSAL</p>
+            </div>
+            <div class="stat-cell">
+                <p class="data" id="hadal-data">--</p>
+                <p class="data-title">HADAL</p>
+            </div>
+        </div>
+
     </div>
 
-<script>
-    $(document).ready(function () {
-
-        function showPopup(popupId) {
-        $('.chose, .play-title, footer').hide();
-        $(popupId).fadeIn();
-        }
-
-        function hidePopup(popupId) {
-            $(popupId).hide();
-            $('.chose, .play-title, footer').fadeIn();
-        }
-
-        if (localStorage.getItem('cameFromTutorial') === 'true') {
-            showPopup('#rules-text');
-            localStorage.removeItem('cameFromTutorial');
-        }
-
-        $('#rules').on('click', function () {
-        showPopup('#rules-text');
-        });
-
-        $('#my-maps-btn').on('click', function () {
-            showPopup('#my-maps');
-        });
-
-        $('#my-stats-btn').on('click', function () {
-            showPopup('#my-stats');
-        });
-
-        $('.exit-game').on('click', function () {
-            hidePopup('#rules-text');
-            hidePopup('#my-maps');
-            hidePopup('#my-stats');
-        });
-        
-    });
-</script>
-
+    <script src="static/js/fetchTables.js"></script>
+    <script src="static/js/navInteraction.js"></script>
+    <script src="static/js/buttonInteraction.js"></script>
 {% endblock %}

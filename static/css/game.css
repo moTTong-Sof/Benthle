@@ -13,13 +13,19 @@ main {
 }
 
 /* PLAYING MAP FEATURES */
+.interaction-btn {
+    display: flex;
+    align-items: center;
+    margin: 0.5em;
+}
+
 .exit-game {
     user-select: none;
 }
 
 .exit-game i {
     font-size: 200%;
-    margin: 1em auto 0;
+    margin: 0.50em 0.25em 0;
 }
 
 #combined-map {
@@ -104,7 +110,7 @@ p.depth {
     font-size: 1.5em;
 }
 
-.next-game {
+.follow {
     padding: 0.25em 0.5em;
     border: none;
     border-radius: 10px;

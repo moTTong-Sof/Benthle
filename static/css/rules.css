@@ -11,7 +11,7 @@
 
 .title {
     font-size: 1.5em;
-    margin: 1em auto;
+    margin: 0 auto 1em;
     width: 10em;
     padding: 0.5em;
     border-radius: 10px;
@@ -22,18 +22,19 @@
 }
 
 .pop-up {
-    margin: 1em 1em -1em;
+    margin: 2em 1em 0;
     color: snow;
     text-align: justify;
     background: #100d61;
     border-radius: 20px;
     padding: 1.5em;
     opacity: 0.95;
+    min-width: 350px;
 }
 
 .exit-game {
     float: right;
-    margin: -0.5em -0.5em 0 0;
+    /* margin: -0.5em -0.5em 0 0; */
     font-size: 120%;
 }
 
@@ -47,3 +48,19 @@
     pointer-events: none;
 }
 
+
+/* STATISTICS */
+
+.stat-cell {
+    margin: 1em;
+    text-align: center;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+p.data-title {
+    font-style: italic;
+}
