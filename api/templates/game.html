@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}Play{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link href="/static/css/loading_screen.css" rel="stylesheet">
+    <link href="/static/css/game.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div id="loading-overlay">
+        <div id="loading-container">
+            <div class="benthle-load loading-message pulsate-fwd"><p class="loading-message">BENTHLE</p><div class="bg-benthle-load"></div></div>
+            <div id="loading-map">
+                <div id="tile-1" class="loading-tile"></div>    
+                <div id="tile-2" class="loading-tile"></div>
+                <div id="tile-3" class="loading-tile"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="interaction-btn">
+        <div class="exit-game" style="display: none;"><a href="/homepage"><i class="fa-solid fa-circle-xmark fa-lg" style="color: darkslategrey;"></i></a></div>
+        <div class="follow next-game" style="display: none;">
+            <button class="follow next-game" onclick="location.href='{{ url_for('homepage') }}'">NEXT LEVEL<i class="fa-solid fa-diagram-next"></i></button>
+        </div>
+        <div class="follow retry-game" style="display: none;">
+            <button class="follow lost-game" onclick="location.href='{{ url_for('homepage') }}'">EXIT<i class="fa-solid fa-diagram-next"></i></button>
+        </div>
+    </div>
+
+
+    <div id="combined-map" style="display: none;">
+
+        <div id="map">
+            <h1 class="title score">  </h1>
+
+            <div class="grid-container" id="grid-container">
+                
+            </div>
+        </div>
+
+        <div id="colorscale">
+            <img id="colorbar" src="" alt="colorscale">
+        </div>
+
+    </div>
+
+    <div class="pop-up max-depth">
+        <p class="text-max-depth depth">DEEPEST TILE</p>
+    </div>
+
+    <div class="pop-up min-depth">
+        <p class="text-min-depth depth">SHALLOWEST TILE</p>
+    </div>
+
+    <script> var difficulty = "{{ difficulty }}"; </script>
+    <script src="static/js/loadingLogic.js"></script>
+    <script src="static/js/fetchTables.js"></script>
+    <script src="static/js/fetchMapData.js"></script>
+    <script src="static/js/accessDifficultyControl.js"></script>
+    <script src="static/js/game.js"></script>
+
+{% endblock %}
