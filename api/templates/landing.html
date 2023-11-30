@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %} Deeply in love with bathymetry{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link href="/static/css/landing.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div id="introDiv">
+        <div class="benthle">
+            
+            <div><img class="benthleLine fade-in" src="static/images/benthleLine.png" alt="Line design simulating the seafloor"></div>
+            <div class="full-title">
+                <h1 class="title">B</h1>
+                <h1 class="title">E</h1>
+                <h1 class="title">N</h1>
+                <h1 class="title">T</h1>
+                <h1 class="title">H</h1>
+                <h1 class="title">L</h1>
+                <h1 class="title">E</h1>
+            </div>
+            
+            <p class="slogan text-flicker-in-glow">Deeply in love with bathymetry</p>
+            
+        </div>
+    </div>
+    
+    <script src="static/js/landing.js"></script>
+
+{% endblock %}
