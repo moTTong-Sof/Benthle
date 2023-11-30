@@ -1,9 +1,11 @@
-from flask import Flask, request, session, render_template, redirect, url_for, jsonify
-from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image, load_map_data, get_user_stats, update_user_stats
-
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, session, current_app, render_template, redirect, url_for, jsonify
+from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image, load_map_data
 from database import db
+from datetime import datetime
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
+import atexit
 import random
 import json
 import uuid
@@ -11,14 +13,14 @@ import uuid
 
 
 app = Flask(__name__)
-app.secret_key = 'pacola'
+app.secret_key = 'my_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///benthle.db'
 
 
 
 with app.app_context():
     db.init_app(app)
-    from models import Userdata, Tempdata
+    from models import Userdata, Tempdata, Maps, Historic
     db.create_all()
     db.session.commit()
 
@@ -35,98 +37,123 @@ DB_BOUNDARIES = {
 
 # Jsonfile for storing our maps informations & difficulties
 json_file_path = 'stored_maps.json'
-valid_difficulties = ['easy', 'medium', 'hard']
+valid_difficulties = ['bathyal', 'abyssal', 'hadal']
+current_date = datetime.now().date()
 """ Global variables """
 
 
 
 @app.route("/generate_maps", methods=["GET"])
-def generate_and_save_maps():
-    requested_difficulties = request.args.getlist('difficulty')
-    global valid_difficulties
+def generate_and_save_maps(difficulties_to_rerun=None):
 
-    if requested_difficulties:
-        difficulties_to_generate = [d for d in requested_difficulties if d in valid_difficulties]
-    else:
-        difficulties_to_generate = valid_difficulties
-    # ex : /generate_maps?difficulty=medium&difficulty=hard
-    
-    existing_maps = {}
-    try:
-        with open(json_file_path, 'r') as f:
-            existing_maps = json.load(f)
-    except FileNotFoundError:
-        pass
+     with app.app_context():
+        app.config['maps_generation_in_progress'] = True
 
-    maps = existing_maps.copy()
-    for difficulty in difficulties_to_generate:
-        if difficulty == 'easy':
-            grid_width = 6
-        elif difficulty == 'medium':
-            grid_width = 7
-        elif difficulty == 'hard':
-            grid_width = 8
+        global valid_difficulties
 
-        # Determine map boundaries, print url and generate colorscale
-        map_boundaries = get_map_boundaries(DB_BOUNDARIES)
-        full_url, colorscale = generate_url_and_colorscale(map_boundaries)
-
-        # Divide map in zones and identify deepest/shallowest zones + playability of the map
-        map_zones = create_map_zones(map_boundaries, grid_width)
-        deepest_zones, shallowest_zones, playability = min_max_depth_zones(map_zones)
-
-        # Define our threshold of playability (90% at max of land)
-        elevation_threshold = 0.8
-        if playability < elevation_threshold:
-            print("-- Not playable. Restarting --")
-            # if it is the 1st map, it will forget about the two other ones // we have to handle this
-            return redirect(url_for('generate_and_save_maps', difficulty=difficulty))
-
+        if difficulties_to_rerun:
+            difficulties_to_generate = difficulties_to_rerun
         else:
-            # Generate url images for each zone
-            for zone in map_zones:
-                zone['url'] = get_url_image(zone, shallowest_zones[0]['min_depth'], deepest_zones[0]['max_depth'])
+            difficulties_to_generate = valid_difficulties
+        
+        existing_maps = {}
+        try:
+            with open(json_file_path, 'r') as f:
+                existing_maps = json.load(f)
+        except FileNotFoundError:
+            pass
 
-            # Generate 3 random zones excluding min and max depth zones for displaying starting tiles + create eligible tiles for later
-            all_zones = list(range(grid_width ** 2))
-            excluded_zones = {zone['zone_index'] for zone in shallowest_zones + deepest_zones}
-            remaining_zones = set(all_zones) - excluded_zones
-            random_zones = random.sample(remaining_zones, 3)
-            print(f'**Random Zones : {random_zones}')
-            eligible_zones = list(remaining_zones - set(random_zones))
-            print(f'**Eligible Zones : {eligible_zones}')
+        maps = existing_maps.copy()
+        difficulties_to_rerun = []
 
-            # Condense all informations into a dict
-            map_data = {
-                'full_url' : full_url,
-                'map_zones' : map_zones,
-                'colorscale' : colorscale,
-                'grid_width' : grid_width,
-                'deepest_zones' : [zone['zone_index'] for zone in deepest_zones],
-                'shallowest_zones' : [zone['zone_index'] for zone in shallowest_zones],
-                'random_zones' : random_zones,
-                'eligible_zones' : eligible_zones
-            }
+        for difficulty in difficulties_to_generate:
+            if difficulty == 'bathyal':
+                grid_width = 6
+            elif difficulty == 'abyssal':
+                grid_width = 7
+            elif difficulty == 'hadal':
+                grid_width = 8
 
-            # Save the generated map data in the 'maps' dictionary
-            maps[difficulty] = map_data
+            # Determine map boundaries, print url and generate colorscale
+            map_boundaries = get_map_boundaries(DB_BOUNDARIES)
+            full_url, colorscale = generate_url_and_colorscale(map_boundaries)
 
-    with open(json_file_path, 'w') as f:
-        json.dump(maps, f)
+            # Divide map in zones and identify deepest/shallowest zones + playability of the map
+            map_zones = create_map_zones(map_boundaries, grid_width)
+            deepest_zones, shallowest_zones, playability = min_max_depth_zones(map_zones)
 
-    tempdata_entries = Tempdata.query.all()
-    for entry in tempdata_entries:
-        entry.reset_fields()
-    db.session.commit()
+            # Define our threshold of playability (90% at max of land)
+            elevation_threshold = 0.8
+            if playability < elevation_threshold:
+                print(f"-- {difficulty} not playable --")
+                difficulties_to_rerun.append(difficulty)
+                continue
 
-    return render_template('homepage.html')
+            else:
+                # Generate url images for each zone
+                for zone in map_zones:
+                    zone['url'] = get_url_image(zone, shallowest_zones[0]['min_depth'], deepest_zones[0]['max_depth'])
+
+                # Generate 3 random zones excluding min and max depth zones for displaying starting tiles + create eligible tiles for later
+                all_zones = list(range(grid_width ** 2))
+                excluded_zones = {zone['zone_index'] for zone in shallowest_zones + deepest_zones}
+                remaining_zones = set(all_zones) - excluded_zones
+                random_zones = random.sample(remaining_zones, 3)
+                print(f'**Random Zones : {random_zones}')
+                eligible_zones = list(remaining_zones - set(random_zones))
+                print(f'**Eligible Zones : {eligible_zones}')
+
+                # Condense all informations into a dict
+                map_data = {
+                    'full_url' : full_url,
+                    'map_zones' : map_zones,
+                    'colorscale' : colorscale,
+                    'grid_width' : grid_width,
+                    'deepest_zones' : [zone['zone_index'] for zone in deepest_zones],
+                    'shallowest_zones' : [zone['zone_index'] for zone in shallowest_zones],
+                    'random_zones' : random_zones,
+                    'eligible_zones' : eligible_zones
+                }
+
+                # Save the generated map data in the 'maps' dictionary
+                maps[difficulty] = map_data
+
+                app.config['maps_generation_in_progress'] = False
+
+                # Save the map data to the Maps model
+                global current_date
+                map_instance = Maps(
+                    day=current_date,  
+                    difficulty_level=difficulty,
+                    min_lat=map_boundaries['min_lat'],
+                    max_lat=map_boundaries['max_lat'],
+                    min_long=map_boundaries['min_lon'],
+                    max_long=map_boundaries['max_lon'],
+                    url=full_url
+                )
+                db.session.add(map_instance)
+    
+
+        with open(json_file_path, 'w') as f:
+            print("Writing data to JSON file...")
+            json.dump(maps, f)
+
+        tempdata_entries = Tempdata.query.all()
+        for entry in tempdata_entries:
+            entry.reset_fields()
+        db.session.commit()
+
+        if difficulties_to_rerun:
+            return generate_and_save_maps(difficulties_to_rerun)
+
+        if current_app and current_app.config.get('TESTING', False):
+            return render_template('homepage.html')
 
 
 @app.before_request
 def redirect_to_landing():
     if 'user_id' not in session and request.endpoint != 'landing':
         return redirect(url_for('landing'))
-
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -169,13 +196,13 @@ def homepage():
 
 @app.route("/game")
 def game():
-    difficulty = request.args.get('difficulty', 'easy')
+    difficulty = request.args.get('difficulty', 'bathyal')
     return render_template('game.html', difficulty=difficulty)
 
 
 @app.route("/game/data")
 def game_data():
-    difficulty = request.args.get('difficulty', 'easy')
+    difficulty = request.args.get('difficulty', 'bathyal')
     map_data = load_map_data(json_file_path, difficulty)
     return jsonify(map_data)
 
@@ -185,17 +212,19 @@ def update_database():
     
     if request.method == 'GET':
         stat_name = request.args.get('stat')
-        print(stat_name)
         table_arg = request.args.get('table')
 
         if stat_name == 'all':
             if table_arg == 'Tempdata':
                 instances = Tempdata.query.filter_by(user_id=session['user_id']).all()
+            elif table_arg == 'Historic':
+                instances = Historic.query.filter_by(player_id=session['user_id']).all()
             else:
                 instances = Userdata.query.filter_by(id=session['user_id']).all()
 
             serialized_data = [instance.serialize() for instance in instances]
             response = {'status': 'success', 'data': serialized_data}
+
         else:
             if table_arg == 'Tempdata':
                 instance = Tempdata.query.filter_by(user_id=session['user_id']).first()
@@ -205,9 +234,9 @@ def update_database():
             value = getattr(instance, stat_name, None)
             if isinstance(value, bool):
                 value = str(value).lower()
-            print(value)
             response = {'status': 'success', 'data': value}
-            print(response)
+        
+        return jsonify(response)
 
     elif request.method == 'POST': 
         stat_name = request.args.get('stat')
@@ -219,21 +248,43 @@ def update_database():
         elif value.lower() == 'false':
             value = False
 
-        if table_arg == 'Tempdata':
-            instance = Tempdata.query.filter_by(user_id=session['user_id']).first()
-        else:
-            instance = Userdata.query.filter_by(id=session['user_id']).first()
-        print(instance)
-        setattr(instance, stat_name, value)
-        db.session.commit()
-        updated_value = getattr(instance, stat_name, None)
-        print(updated_value)
-        response = {'status': 'success', 'data': updated_value}
+        try:
+            if table_arg == 'Tempdata':
+                instance = Tempdata.query.filter_by(user_id=session['user_id']).first()
+            elif table_arg == 'Userdata':
+                instance = Userdata.query.filter_by(id=session['user_id']).first()
+            elif table_arg == 'Historic':
+                url = Maps.query.filter_by(difficulty_level=stat_name, day=value).first()
+                user_historic = Historic(session['user_id'], value, stat_name, url.url)
+                db.session.add(user_historic)
+            
+            if table_arg != 'Historic':
+                setattr(instance, stat_name, value)
+                db.session.commit()
+                updated_value = getattr(instance, stat_name, None)
+                response = {'status': 'success', 'data': updated_value}
+            else:
+                db.session.commit()
+                response = {'status': 'success', 'message': 'Historic data added successfully'}
+            
+            db.session.commit()
+            return jsonify(response)
+
+        except Exception as e:
+            print(f"Error updating database: {e}")
+            response = {'status': 'error', 'message': 'Internal Server Error'}
+            return jsonify(response), 500
 
     else:
         response = {'status': 'error', 'message': 'Invalid request method'}
+        return jsonify(response)
 
-    return jsonify(response)
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
+scheduler.start()
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 
 
 if __name__ == '__main__':

@@ -4,9 +4,9 @@ let accessGranted = false;
 
 const accessControl = {
     3: [''],
-    2: ['hard'],
-    1: ['medium'],
-    0: ['easy']
+    2: ['hadal'],
+    1: ['abyssal'],
+    0: ['bathyal']
 };
 
 async function checkAccessAndProceed(difficulty) {

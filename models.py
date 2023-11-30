@@ -70,3 +70,44 @@ class Tempdata(db.Model):
         self.left_mid_game = False
         self.attempts = 0
         self.total_att_used = 0
+
+    
+class Historic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.String(36))
+    day = db.Column(db.String)
+    difficulty = db.Column(db.String)
+    url = db.Column(db.String(512))
+
+    def __init__(self, player_id, day, difficulty, url):
+        self.player_id = player_id
+        self.day = day
+        self.difficulty = difficulty
+        self.url = url
+
+    def serialize(self):
+        return {
+                'day': self.day,
+                'difficulty': self.difficulty,
+                'url': self.url,
+            }
+    
+
+class Maps(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    day = db.Column(db.String)
+    difficulty_level = db.Column(db.String)
+    min_lat = db.Column(db.Float)
+    max_lat = db.Column(db.Float)
+    min_long = db.Column(db.Float)
+    max_long = db.Column(db.Float)
+    url = db.Column(db.String(512))
+
+    def __init__(self, day, difficulty_level, min_lat, max_lat, min_long, max_long, url):
+        self.day = day
+        self.difficulty_level = difficulty_level
+        self.min_lat = min_lat
+        self.max_lat = max_lat
+        self.min_long = min_long
+        self.max_long = max_long
+        self.url = url

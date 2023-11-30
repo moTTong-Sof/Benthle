@@ -165,11 +165,11 @@ function initializeGameLogic() {
     function trackExercises(){
         console.log('highestExercise is ' + highestExercise);
         console.log('difficulty is ' + difficulty)
-        if (difficulty === 'easy') {
+        if (difficulty === 'bathyal') {
             currentExercise = 1
-        } else if (difficulty === 'medium') {
+        } else if (difficulty === 'abyssal') {
             currentExercise = 2
-        } else if (difficulty === 'hard') {
+        } else if (difficulty === 'hadal') {
             currentExercise = 3
         }
         localStorage.setItem('currentExercise', currentExercise);
@@ -187,9 +187,6 @@ function initializeGameLogic() {
         }, 1500);
 
         highestExercise = currentExercise > highestExercise ? highestExercise = currentExercise : highestExercise;
-        // if (highestExercise === 3) {
-        //     localStorage.setItem('finish', true); // to display stats automatically when leaving
-        // }
 
         fetchTablesPost('highest_exercise', highestExercise, 'Tempdata')
             .then(function (response) {
@@ -205,18 +202,16 @@ function initializeGameLogic() {
 
 
     function endLooseGame(maxStreak) {
-
-        fetchTablesGet('max_streak')
+        fetchTablesGet('max_streak', 'Userdata')
             .then (function(response) {
-                fetchTablesGet('current_streak')
+                fetchTablesGet('current_streak', 'Userdata')
                     .then (function(response2) {
                         currentStreak = parseInt(response2) || 0;
                         maxStreak = parseInt(response) || 0;
                         maxStreak = maxStreak < currentStreak ? currentStreak : maxStreak;
 
-                        fetchTablesPost('current_streak', 0)
-                
-                        fetchTablesPost('max_streak', maxStreak)
+                        fetchTablesPost('current_streak', 0, 'Userdata')
+                        fetchTablesPost('max_streak', maxStreak, 'Userdata')
                             .then(function (response) {
                                 console.log('Updated max_streak value:', response.value);
                             })
@@ -235,15 +230,24 @@ function initializeGameLogic() {
                 console.error('Error updating highest_exercise:', error);
             });
 
+        fetchTablesGet('total_att_used', 'Tempdata')
+            .then(function (response) {
+                totalAttemptsUsed = parseInt(response);
+                totalAttemptsUsed++;
+                console.log('posting todays attempts: ', totalAttemptsUsed)
+                fetchTablesPost('today_attempts', totalAttemptsUsed, 'Userdata');
+            })
+            .catch(function (error) {
+                console.error('Error updating today_attempts:', error);
+            });
+
         setTimeout(function () {
             $('.image-container').find('.tiles').show().addClass(flipTile);
             $('.image-container').css('border', 'none');
             $('.exit-game').hide()
             $('.retry-game').show()
-            // DEACTIVATE THE interaction
+            // DEACTIVATE THE interaction from refresh
         }, 1500);
-
-        // localStorage.setItem('finish', true);
     }
 
 
@@ -259,14 +263,15 @@ function initializeGameLogic() {
         });
     }
 
+
     function updateAttempts(lastTileWin) {
         maxAttempts--;
         console.log('decrementing maxAttempts')
 
         $('h1.score').text('ATTEMPTS LEFT : ' + maxAttempts);
         fetchTablesPost('attempts', maxAttempts, 'Tempdata')
-            .then(function (response) {
-                console.log('Updated attempts value:', response);
+            .then(function(response) {
+                console.log('attempts from UpdateAttemps func: ', response)
             })
             .catch(function (error) {
                 console.error('Error updating attempts:', error);
@@ -277,11 +282,7 @@ function initializeGameLogic() {
                 totalAttemptsUsed = parseInt(response) || 0;
                 totalAttemptsUsed++;
                 return fetchTablesPost('total_att_used', totalAttemptsUsed, 'Tempdata');
-            })
-            .catch(function (error) {
-                console.error('Error updating total_att_used:', error);
-            });
-            
+            }) 
 
         if (maxAttempts === 0 && !lastTileWin) {
             gameEnd = true;
@@ -290,10 +291,6 @@ function initializeGameLogic() {
                 lostSound.play();
             }, 500);
             endLooseGame();
-        }
-
-        if (highestExercise === 3) {
-            localStorage.setItem('finish', true); // to display stats automatically when leaving
         }
     }
 
@@ -308,19 +305,23 @@ function initializeGameLogic() {
         goodTileSound.play();
     }
 
+
     function leftMid() {
         fetchTablesPost('left_mid_game', true, 'Tempdata')
             .then(function (response) {
-                console.log('Updated left_mid_name value:', response);
+                console.log('Updated left_mid_game value:', response);
                 fetchTablesPost('attempts', maxAttempts, 'Tempdata');
             })
             .catch(function (error) {
-                console.error('Error updating highest_exercise:', error);
+                console.error('Error updating left_mid_game:', error);
             });
     }
 
 
     function updatePlayerStats(currentExercise) {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0];
+
         var key;
         if (currentExercise === 1){
             key = 'bathyal'
@@ -330,42 +331,48 @@ function initializeGameLogic() {
             key = 'hadal'
         }
 
-        fetchTablesGet(key)
+        fetchTablesGet(key, 'Userdata')
             .then(function (completExoValue) {
                 completExoValue = parseInt(completExoValue) || 0;
                 completExoValue++;
                 console.log('Updated ' + key + ' value:', completExoValue);
-                return fetchTablesPost(key, completExoValue);
+                return fetchTablesPost(key, completExoValue, 'Userdata');
+                // post bathyal map
             })
             .catch(function (error) {
                 console.error('Error updating total_att_used:', error);
             });
 
+        fetchTablesPost(key, formattedDate, 'Historic')
+            .catch(function (error) {
+                console.error('Error updating Historic:', error);
+            });
+
         if (currentExercise === 3){
-            fetchTablesGet('current_streak')
+            localStorage.setItem('finish', true); // to display stats automatically when leaving
+
+            fetchTablesGet('current_streak', 'Userdata')
                 .then(function (response) {
                     streak = parseInt(response) || 0;
                     streak++;
                     console.log('Updated current_streak value:', response.value);
-                    return fetchTablesPost('current_streak', streak);
+                    return fetchTablesPost('current_streak', streak, 'Userdata');
                 })
                 .catch(function (error) {
                     console.error('Error updating current_streak:', error);
                 });
 
-            var currentDate = new Date();
-            var formattedDate = currentDate.toISOString().split('T')[0];
-            fetchTablesPost('last_win', formattedDate)
-                .then(function (response) {
-                    console.log('Updated last_win value:', formattedDate);
-                })
+            fetchTablesPost('last_win', formattedDate, 'Userdata')
                 .catch(function (error) {
                     console.error('Error updating last_win:', error);
                 });
 
             fetchTablesGet('total_att_used', 'Tempdata')
-                .then(function (totalAttemptsUsed) {
-                    return fetchTablesPost('today_attempts', totalAttemptsUsed);
+                .then(function (response) {
+                    totalAttemptsUsed = parseInt(response);
+                    totalAttemptsUsed++;
+                    console.log('posting todays attempts: ', totalAttemptsUsed)
+                    fetchTablesPost('today_attempts', totalAttemptsUsed, 'Userdata');
                 })
                 .catch(function (error) {
                     console.error('Error updating today_attempts:', error);

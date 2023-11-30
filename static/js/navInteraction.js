@@ -15,6 +15,7 @@ $(document).ready(function () {
 
     $('#my-maps-btn').on('click', function () {
         showPopup('#my-maps');
+        getPlayerHistoric();
     });
 
     $('#my-stats-btn').on('click', function () {
@@ -40,8 +41,66 @@ $(document).ready(function () {
         $('nav').removeClass('nav-deactivated');
     }
 
+    function getPlayerHistoric() {
+        fetchTablesGet('all', 'Historic')
+            .then(function (response) {
+                const groupedByDate = groupByDate(response);
+                displayGroupedMaps(groupedByDate);
+            })
+            .catch(function (error) {
+                console.error('Error fetching historic data:', error);
+            });
+    }
+    
+    function groupByDate(maps) {
+        const groupedByDate = new Map();
+        maps.forEach((map) => {
+            const date = map.day;
+    
+            if (!groupedByDate.has(date)) {
+                groupedByDate.set(date, []);
+            }
+            groupedByDate.get(date).push(map);
+        });
+        return groupedByDate;
+    }
+    
+    function displayGroupedMaps(groupedByDate) {
+        const container = document.getElementById('maps-container');
+        container.innerHTML = '';
+    
+        groupedByDate.forEach((maps, date) => {
+            const dateContainer = document.createElement('div');
+            dateContainer.classList.add('date-container');
+    
+            const datetimeHeader = document.createElement('h4');
+            datetimeHeader.textContent = date;
+            dateContainer.appendChild(datetimeHeader);
+    
+            maps.forEach((map, index) => {
+                const mapContainer = document.createElement('div');
+                mapContainer.classList.add('map-container');
+    
+                // if (map.difficulty) {
+                //     const difficultyTitle = document.createElement('h3');
+                //     difficultyTitle.textContent = `Difficulty: ${map.difficulty}`;
+                //     mapContainer.appendChild(difficultyTitle);
+                // }
+    
+                const mapImage = document.createElement('img');
+                mapImage.src = map.url;
+                mapImage.alt = `Map ${index + 1}`;
+                mapContainer.appendChild(mapImage);
+    
+                dateContainer.appendChild(mapContainer);
+            });
+    
+            container.appendChild(dateContainer);
+        });
+    }    
+
     function getPlayerStats() {
-        fetchTablesGet('all')
+        fetchTablesGet('all', 'Userdata')
         .then(function (response) {
             console.log(response);
             if (Array.isArray(response) && response.length > 0) {

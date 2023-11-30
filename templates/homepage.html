@@ -19,11 +19,11 @@
     <div id="choose-difficulty">
         <h4 class="play-title">Unlock the secrets of the benthic zone</h4>
         <form class="chose" method="post" action="{{ url_for('homepage') }}">
-            <button class="btn-loading locker0" type="submit" name="difficulty" value="easy">BATHYAL</button>
+            <button class="btn-loading locker0" type="submit" name="difficulty" value="bathyal">BATHYAL</button>
             <i class="fa-solid fa-lock locker locker1"></i>
-            <button class="btn-loading locker1 disabled" disabled type="submit" name="difficulty" value="medium">ABYSSAL</button>
+            <button class="btn-loading locker1 disabled" disabled type="submit" name="difficulty" value="abyssal">ABYSSAL</button>
             <i class="fa-solid fa-lock locker locker2"></i>
-            <button class="btn-loading locker2 disabled" type="submit" name="difficulty" value="hard">HADAL</button>
+            <button class="btn-loading locker2 disabled" type="submit" name="difficulty" value="hadal">HADAL</button>
             <i class="fa-solid fa-lock locker locker3"></i>
         </form>
     </div>
@@ -39,7 +39,7 @@
     <div class="pop-up" style="display: none;" id="my-maps">
         <div class="exit-game"><i class="fa-solid fa-xmark fa-xl"></i></div>
         <h1 class="title">Map's collection</h1>
-        <p>Feature not available yet</p>
+        <div id="maps-container"></div>
     </div>
 
     <div class="pop-up" style="display: none;" id="my-stats">

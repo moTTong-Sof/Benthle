@@ -27,7 +27,7 @@
     text-align: justify;
     background: #100d61;
     border-radius: 20px;
-    padding: 1.5em;
+    padding: 1.5em 1em;
     opacity: 0.95;
     min-width: 350px;
 }
@@ -63,4 +63,8 @@
 
 p.data-title {
     font-style: italic;
+}
+
+#maps-container {
+    text-align: center;
 }

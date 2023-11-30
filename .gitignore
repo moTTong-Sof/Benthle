@@ -9,3 +9,4 @@ static/js/previous_versions
 static/js/playerStats.js
 static/images/bathymetry_background.png
 instance
+stored_maps.json

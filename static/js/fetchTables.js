@@ -37,7 +37,7 @@ function fetchTablesPost(statName, value, tablename) {
             success: function (response) {
                 console.log(response);
                 if (response.status === 'success') {
-                    resolve({ value: response.value });
+                    resolve(response.data);
                 } else {
                     reject(response);
                 }
@@ -49,46 +49,3 @@ function fetchTablesPost(statName, value, tablename) {
         });
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function fetchTables(requestType, statName, value) {
-//     return new Promise(function (resolve, reject) {
-//         $.ajax({
-//             type: requestType,
-//             url: '/update_database',
-//             contentType: 'application/json;charset=UTF-8',
-//             data: JSON.stringify({
-//                 stat: statName,
-//                 value: value
-//             }),
-//             success: function (response) {
-//                 console.log(response);
-//                 if (response.status === 'success') {
-//                     resolve(response.value);
-//                 } else {
-//                     reject(response);
-//                 }
-//             },
-//             error: function (error) {
-//                 console.error('Error:', error);
-//                 reject(error);
-//             }
-//         });
-//     });
-// }

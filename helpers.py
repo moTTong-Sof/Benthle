@@ -8,48 +8,6 @@ import numpy as np
 
 from database import db
 
-# def get_user_stats(user_data, temp_data):
-#     if user_data and temp_data:
-#         return {
-#             'id': user_data.id,
-#             'last_win': user_data.last_win,
-#             'today_attempts': user_data.today_attempts,
-#             'current_streak': user_data.current_streak,
-#             'max_streak': user_data.max_streak,
-#             'bathyal': user_data.bathyal,
-#             'abyssal': user_data.abyssal,
-#             'hadal': user_data.hadal,
-#             'current_exercise': temp_data.current_exercise,
-#             'highest_exercise': temp_data.highest_exercise,
-#             'all_game_done': temp_data.all_game_done,
-#             'attempts': temp_data.attempts,
-#             'total_att_used': temp_data.total_att_used
-#         }
-#     else:
-#         return {'status': 'error', 'message': 'User not found in the database'}
-
-
-
-def get_user_stats(table, stat_name):
-    if table:
-        if hasattr(table, stat_name):
-            value = table.stat_name
-
-
-
-
-def update_user_stats(table, stat_name, value):
-    if table:
-        if hasattr(table, stat_name):
-            setattr(table, stat_name, value)
-            db.session.commit()
-            return {'status': 'success', 'message': 'Database updated successfully'}
-        else:
-            return {'status': 'error', 'message': 'Invalid stat name'}
-    else:
-        return {'status': 'error', 'message': 'User not found in the database'}
-
-
 
 def get_map_boundaries(db_boundaries, map_size=5):
     """
