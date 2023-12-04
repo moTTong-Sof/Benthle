@@ -7,6 +7,7 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import os
 import atexit
 import random
 import json
@@ -16,7 +17,9 @@ import uuid
 app = Flask(__name__)
 
 
-if app.config['FLASK_ENV'] == 'production':
+flask_env = os.getenv('FLASK_ENV', 'development')
+
+if flask_env == 'production':
     app.config.from_object('config.ProductionConfig')
 else:
     app.config.from_object('config.DevelopmentConfig')
