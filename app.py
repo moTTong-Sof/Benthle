@@ -104,6 +104,7 @@ def generate_and_save_maps(difficulties_to_rerun=None):
                 all_zones = list(range(grid_width ** 2))
                 excluded_zones = {zone['zone_index'] for zone in shallowest_zones + deepest_zones}
                 remaining_zones = set(all_zones) - excluded_zones
+                remaining_zones = list(remaining_zones)
                 random_zones = random.sample(remaining_zones, 3)
                 print(f'**Random Zones : {random_zones}')
                 eligible_zones = list(remaining_zones - set(random_zones))
