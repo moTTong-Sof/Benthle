@@ -1,22 +1,25 @@
 from flask import Flask, request, session, current_app, render_template, redirect, url_for, jsonify
 from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image, load_map_data
 from database import db
+from config import DevelopmentConfig, ProductionConfig
+
 from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-import os
 import atexit
 import random
 import json
 import uuid
 
 
-
 app = Flask(__name__)
-app.secret_key = 'mysecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///benthle.db')
 
+
+if app.config['FLASK_ENV'] == 'production':
+    app.config.from_object('config.ProductionConfig')
+else:
+    app.config.from_object('config.DevelopmentConfig')
 
 
 with app.app_context():
@@ -24,7 +27,6 @@ with app.app_context():
     from models import Userdata, Tempdata, Maps, Historic
     db.create_all()
     db.session.commit()
-
 
 
 """ Global variables """
