@@ -281,7 +281,7 @@ def update_database():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
+scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=15)
 scheduler.start()
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
