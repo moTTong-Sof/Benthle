@@ -107,7 +107,7 @@ def generate_and_save_maps(difficulties_to_rerun=None):
                 remaining_zones = list(remaining_zones)
                 random_zones = random.sample(remaining_zones, 3)
                 print(f'**Random Zones : {random_zones}')
-                eligible_zones = list(remaining_zones - set(random_zones))
+                eligible_zones = list(set(remaining_zones) - set(random_zones))
                 print(f'**Eligible Zones : {eligible_zones}')
 
                 # Condense all informations into a dict
