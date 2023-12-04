@@ -5,6 +5,7 @@ from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import os
 import atexit
 import random
 import json
@@ -14,7 +15,7 @@ import uuid
 
 app = Flask(__name__)
 app.secret_key = 'mysecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///benthle.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///benthle.db')
 
 
 
