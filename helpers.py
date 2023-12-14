@@ -248,15 +248,12 @@ def get_url_image(zone, min_depth, max_depth, round_increment=100):
     vars_value = "longitude|latitude|elevation"
 
     # Check if the values are not NaN before rounding
-    if not math.isnan(min_depth):
-        rounded_min_depth = round(min_depth / round_increment) * round_increment
-    else:
-        rounded_min_depth = 0
+    rounded_min_depth = math.floor(min_depth / round_increment) * round_increment if not math.isnan(min_depth) else 0
+    rounded_max_depth = math.ceil(max_depth / round_increment) * round_increment if not math.isnan(max_depth) else 0
 
-    if not math.isnan(max_depth):
-        rounded_max_depth = round(max_depth / round_increment) * round_increment
-    else:
-        rounded_max_depth = 0
+    # Ensure that rounded values encompass the original values
+    rounded_min_depth = min(rounded_min_depth, min_depth)
+    rounded_max_depth = max(rounded_max_depth, max_depth)
 
     # global var color set in generate_url_and_colorscale()
     colorbar_value = f"{color}||Linear|{rounded_min_depth}|{rounded_max_depth}|"

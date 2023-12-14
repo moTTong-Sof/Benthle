@@ -14,9 +14,9 @@ function fetchMapData() {
         // Store our data dict
         mapZones = data.map_zones;
         maxDepthZones = data.deepest_zones;
+        console.log(mapZones);
         minDepthZones = data.shallowest_zones;
         gridWidth = data.grid_width;
-        console.log(gridWidth);
         randomZones = data.random_zones;
         eligibleZones = data.eligible_zones;
 

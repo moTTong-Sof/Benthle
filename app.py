@@ -1,5 +1,5 @@
 from flask import Flask, request, session, current_app, render_template, redirect, url_for, jsonify
-from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image, load_map_data
+from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image
 from database import db
 from config import DevelopmentConfig, ProductionConfig
 
@@ -62,14 +62,6 @@ def generate_and_save_maps(difficulties_to_rerun=None):
         else:
             difficulties_to_generate = valid_difficulties
         
-        existing_maps = {}
-        try:
-            with open(json_file_path, 'r') as f:
-                existing_maps = json.load(f)
-        except FileNotFoundError:
-            pass
-
-        maps = existing_maps.copy()
         difficulties_to_rerun = []
 
         for difficulty in difficulties_to_generate:
@@ -105,45 +97,47 @@ def generate_and_save_maps(difficulties_to_rerun=None):
                 excluded_zones = {zone['zone_index'] for zone in shallowest_zones + deepest_zones}
                 remaining_zones = set(all_zones) - excluded_zones
                 remaining_zones = list(remaining_zones)
-                random_zones = random.sample(remaining_zones, 3)
+
+                if len(remaining_zones) >= 3:
+                    random_zones = random.sample(remaining_zones, 3)
+                else:
+                    random_zones = remaining_zones.copy()
+                    remaining_samples = 3 - len(random_zones)
+                    if remaining_samples > 0:
+                        random_zones.extend(shallowest_zones[:remaining_samples])
                 print(f'**Random Zones : {random_zones}')
+
                 eligible_zones = list(set(remaining_zones) - set(random_zones))
                 print(f'**Eligible Zones : {eligible_zones}')
 
-                # Condense all informations into a dict
-                map_data = {
-                    'full_url' : full_url,
-                    'map_zones' : map_zones,
-                    'colorscale' : colorscale,
-                    'grid_width' : grid_width,
-                    'deepest_zones' : [zone['zone_index'] for zone in deepest_zones],
-                    'shallowest_zones' : [zone['zone_index'] for zone in shallowest_zones],
-                    'random_zones' : random_zones,
-                    'eligible_zones' : eligible_zones
-                }
-
-                # Save the generated map data in the 'maps' dictionary
-                maps[difficulty] = map_data
-
                 app.config['maps_generation_in_progress'] = False
+
+                # Convert lists to JSON-compatible strings
+                map_zones_json = json.dumps(map_zones)
+                deepest_zones_json = json.dumps([zone['zone_index'] for zone in deepest_zones])
+                shallowest_zones_json = json.dumps([zone['zone_index'] for zone in shallowest_zones])
+                random_zones_json = json.dumps(random_zones)
+                eligible_zones_json = json.dumps(eligible_zones)
 
                 # Save the map data to the Maps model
                 global current_date
                 map_instance = Maps(
-                    day=current_date,  
+                    day=current_date,
                     difficulty_level=difficulty,
                     min_lat=map_boundaries['min_lat'],
                     max_lat=map_boundaries['max_lat'],
                     min_long=map_boundaries['min_lon'],
                     max_long=map_boundaries['max_lon'],
-                    url=full_url
+                    url=full_url,
+                    colorscale=colorscale,
+                    grid_width=grid_width,
+                    map_zones=map_zones_json,
+                    deepest_zones=deepest_zones_json,
+                    shallowest_zones=shallowest_zones_json,
+                    random_zones=random_zones_json,
+                    eligible_zones=eligible_zones_json
                 )
                 db.session.add(map_instance)
-    
-
-        with open(json_file_path, 'w') as f:
-            print("Writing data to JSON file...")
-            json.dump(maps, f)
 
         tempdata_entries = Tempdata.query.all()
         for entry in tempdata_entries:
@@ -210,8 +204,22 @@ def game():
 @app.route("/game/data")
 def game_data():
     difficulty = request.args.get('difficulty', 'bathyal')
-    map_data = load_map_data(json_file_path, difficulty)
-    return jsonify(map_data)
+    global current_date
+    map_instance = Maps.query.filter_by(difficulty_level=difficulty, day=current_date).first()
+
+    if map_instance:
+        map_data = map_instance.serialize()
+        # Parse JSON fields
+        map_data['map_zones'] = json.loads(map_data['map_zones'])
+        map_data['deepest_zones'] = json.loads(map_data['deepest_zones'])
+        map_data['shallowest_zones'] = json.loads(map_data['shallowest_zones'])
+        map_data['random_zones'] = json.loads(map_data['random_zones'])
+        map_data['eligible_zones'] = json.loads(map_data['eligible_zones'])
+
+        return jsonify(map_data)
+    
+    else:
+        return jsonify({'error': 'Map data not found for the specified difficulty and day'}), 404
 
 
 @app.route('/update_database', methods=['GET', 'POST'])
@@ -288,7 +296,7 @@ def update_database():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=15)
+scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
 scheduler.start()
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())

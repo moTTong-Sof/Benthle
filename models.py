@@ -102,8 +102,15 @@ class Maps(db.Model):
     min_long = db.Column(db.Float)
     max_long = db.Column(db.Float)
     url = db.Column(db.String(512))
+    map_zones = db.Column(db.String)
+    colorscale = db.Column(db.String(512))
+    grid_width = db.Column(db.Integer)
+    deepest_zones = db.Column(db.String)
+    shallowest_zones = db.Column(db.String)
+    random_zones = db.Column(db.String)
+    eligible_zones = db.Column(db.String)
 
-    def __init__(self, day, difficulty_level, min_lat, max_lat, min_long, max_long, url):
+    def __init__(self, day, difficulty_level, min_lat, max_lat, min_long, max_long, url, colorscale, grid_width, map_zones, deepest_zones, shallowest_zones, random_zones, eligible_zones):
         self.day = day
         self.difficulty_level = difficulty_level
         self.min_lat = min_lat
@@ -111,3 +118,28 @@ class Maps(db.Model):
         self.min_long = min_long
         self.max_long = max_long
         self.url = url
+        self.colorscale = colorscale
+        self.grid_width = grid_width
+        self.map_zones = map_zones
+        self.deepest_zones = deepest_zones
+        self.shallowest_zones = shallowest_zones
+        self.random_zones = random_zones
+        self.eligible_zones = eligible_zones
+
+    def serialize(self):
+        return {
+            'day': self.day,
+            'difficulty_level': self.difficulty_level,
+            'min_lat': self.min_lat,
+            'max_lat': self.max_lat,
+            'min_long': self.min_long,
+            'max_long': self.max_long,
+            'url': self.url,
+            'colorscale': self.colorscale,
+            'grid_width': self.grid_width,
+            'map_zones': self.map_zones,
+            'deepest_zones': self.deepest_zones,
+            'shallowest_zones': self.shallowest_zones,
+            'random_zones': self.random_zones,
+            'eligible_zones': self.eligible_zones
+        }
