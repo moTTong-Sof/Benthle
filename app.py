@@ -205,7 +205,8 @@ def game():
 def game_data():
     difficulty = request.args.get('difficulty', 'bathyal')
     global current_date
-    map_instance = Maps.query.filter_by(difficulty_level=difficulty, day=current_date).first()
+    formatted_date = current_date.strftime('%Y-%m-%d')
+    map_instance = Maps.query.filter_by(difficulty_level=difficulty, day=formatted_date).first()
 
     if map_instance:
         map_data = map_instance.serialize()

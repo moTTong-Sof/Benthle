@@ -27,6 +27,10 @@ function fetchMapData() {
             gridRow.className = 'grid-row';
             for (var col = 0; col < gridWidth; col++) {
                 var index = row * gridWidth + col;
+                var dataZone = mapZones[index];
+
+                console.log("Index:", index, "Data Zone:", dataZone['index'], "URL:", dataZone['url']);
+
                 var imageContainer = document.createElement('div');
                 imageContainer.className = 'image-container';
                 imageContainer.setAttribute('data-zone', mapZones[index]['index']);
