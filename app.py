@@ -6,6 +6,7 @@ from config import DevelopmentConfig, ProductionConfig
 from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 import os
 import atexit
@@ -297,7 +298,8 @@ def update_database():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
+# scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
+scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=0, minute=0), timezone="Europe/Paris")
 scheduler.start()
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
