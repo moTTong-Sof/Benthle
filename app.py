@@ -297,7 +297,8 @@ def update_database():
         return jsonify(response)
 
 
-scheduler = BackgroundScheduler()
+# scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone="Europe/Paris")
 # scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
 scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=23, minute=50), timezone="Europe/Paris")
 scheduler.start()
