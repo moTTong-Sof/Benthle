@@ -299,7 +299,7 @@ def update_database():
 
 scheduler = BackgroundScheduler()
 # scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
-scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=0, minute=0), timezone="Europe/Paris")
+scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=23, minute=50), timezone="Europe/Paris")
 scheduler.start()
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())

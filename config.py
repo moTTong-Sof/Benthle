@@ -17,6 +17,7 @@ class Config(object):
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASEDIR, 'instance', 'benthle.db')}"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAPS_GENERATION_IN_PROGRESS = False
 
 class ProductionConfig(Config):
     FLASK_ENV = 'production'
