@@ -5,9 +5,6 @@ from config import DevelopmentConfig, ProductionConfig
 
 from datetime import datetime
 
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
-
 import os
 import atexit
 import random
@@ -43,7 +40,6 @@ DB_BOUNDARIES = {
 }
 
 # Jsonfile for storing our maps informations & difficulties
-json_file_path = 'stored_maps.json'
 valid_difficulties = ['bathyal', 'abyssal', 'hadal']
 current_date = datetime.now().date()
 """ Global variables """
@@ -76,6 +72,7 @@ def generate_and_save_maps(difficulties_to_rerun=None):
             # Determine map boundaries, print url and generate colorscale
             map_boundaries = get_map_boundaries(DB_BOUNDARIES)
             full_url, colorscale = generate_url_and_colorscale(map_boundaries)
+            url = f'{full_url}'
 
             # Divide map in zones and identify deepest/shallowest zones + playability of the map
             map_zones = create_map_zones(map_boundaries, grid_width)
@@ -129,7 +126,7 @@ def generate_and_save_maps(difficulties_to_rerun=None):
                     max_lat=map_boundaries['max_lat'],
                     min_long=map_boundaries['min_lon'],
                     max_long=map_boundaries['max_lon'],
-                    url=full_url,
+                    url=url,
                     colorscale=colorscale,
                     grid_width=grid_width,
                     map_zones=map_zones_json,
@@ -272,6 +269,7 @@ def update_database():
                 instance = Userdata.query.filter_by(id=session['user_id']).first()
             elif table_arg == 'Historic':
                 url = Maps.query.filter_by(difficulty_level=stat_name, day=value).first()
+                print(url)
                 user_historic = Historic(session['user_id'], value, stat_name, url.url)
                 db.session.add(user_historic)
             
@@ -297,11 +295,15 @@ def update_database():
         return jsonify(response)
 
 
-# scheduler = BackgroundScheduler()
-scheduler = BackgroundScheduler(timezone="Europe/Paris")
-# scheduler.add_job(func=generate_and_save_maps, trigger="interval", minutes=2)
-scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=0, minute=0), timezone="Europe/Paris")
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+import pytz
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=00, minute=00), timezone=pytz.utc)
+print("Scheduler starting...")
 scheduler.start()
+print("Scheduler started.")
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
 
