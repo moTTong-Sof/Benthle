@@ -162,13 +162,12 @@ def landing():
         session['user_id'] = str(uuid.uuid4())
         new_user = Userdata(session['user_id'], None, 0, 0, 0, 0, 0, 0)
         db.session.add(new_user)
+        print('new_user created')
 
         new_user_temp = Tempdata(new_user.id, 0, 0, 0, 0)
         db.session.add(new_user_temp)
         db.session.commit()
-        
-        print(new_user)
-        print(new_user_temp)
+        print('new_user_temp created')
     
     return render_template('landing.html')
 
@@ -300,8 +299,7 @@ from apscheduler.triggers.cron import CronTrigger
 import pytz
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=1, minute=20), timezone=pytz.utc)
-print("Scheduler starting...")
+scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=11, minute=40), timezone=pytz.utc)
 scheduler.start()
 print("Scheduler started.")
 # Shut down the scheduler when exiting the app
@@ -309,4 +307,4 @@ atexit.register(lambda: scheduler.shutdown())
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=False) 
