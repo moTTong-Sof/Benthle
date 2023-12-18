@@ -300,7 +300,7 @@ from apscheduler.triggers.cron import CronTrigger
 import pytz
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=00, minute=00), timezone=pytz.utc)
+scheduler.add_job(func=generate_and_save_maps, trigger=CronTrigger(hour=1, minute=20), timezone=pytz.utc)
 print("Scheduler starting...")
 scheduler.start()
 print("Scheduler started.")
