@@ -12,17 +12,17 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
 
 ## Code explanation
 ### Backend files
-**config.py** defines environement variables such as `SECRET_KEY` and `DATABASE_URL`.
+***config.py*** defines environement variables such as `SECRET_KEY` and `DATABASE_URL`.
 
-**database.py**'s purpose is to import sqlachemy in one place only and then be able to call it wherever it is needed to avoid multiple `db`.
+***database.py***'s purpose is to import sqlachemy in one place only and then be able to call it wherever it is needed to avoid multiple `db`.
 
-**models.py** defines 4 classes and their corresponding tables into the database. Each of classes also has a `serialize()` function for more practicity.
+***models.py*** defines 4 classes and their corresponding tables into the database. Each of classes also has a `serialize()` function for more practicity.
 - `Userdata` stores "game" statistics from the users based upon their actions (last win, current win streak, how many time they finish each level, etc.). Players will then be able to check their statistics in the app.
 - `Tempdata` stores temporary informations about the user to track its daily progression, mainly for "fairness" purposes because otherwise players could skip levels and/or reset the number of daily attempts just by leaving "mid-game". This class has a `reset_fields()` function that is called everyday, once new maps are created, to enable users to play again.
 - `Maps` stores all the informations needed to reproduce the maps in our browser.
 - `Historic` creates entries each time a user finishes a map. By keeping tracks of the maps "gathered", users can then visualize all of them in the app.
 
-**helpers.py** contains all the support functions for `generate_maps.py`
+***helpers.py*** contains all the support functions for `generate_maps.py`
 - `get_map_boundaries()` generates random boundaries for a square map.
     Arguments : 
     - db_boundaries : the geographical boundaries of our database
@@ -64,11 +64,11 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
     Return :
     - url : a url with only the data plotted in it
 
-**generate_maps.py** combines all the **helpers.py** functions into `generate_and_save_maps()`. Every time the function is called, it will generate 3 maps according to the 3 difficulties of the game and then stores all the elements gathered into our database table `Maps`. If a map (or more) is deemed not playable, it will rerun the function only for it. It also resets the whole `Tempdata` table to allow players to play again for the day. 
+***generate_maps.py*** combines all the ***helpers.py*** functions into `generate_and_save_maps()`. Every time the function is called, it will generate 3 maps according to the 3 difficulties of the game and then stores all the elements gathered into our database table `Maps`. If a map (or more) is deemed not playable, it will rerun the function only for it. It also resets the whole `Tempdata` table to allow players to play again for the day. 
 
-**scheduler.py** schedules `generate_and_save_maps()` everyday at 0:00 UTC and is called in **app.py**.
+***scheduler.py*** schedules `generate_and_save_maps()` everyday at 0:00 UTC and is called in ***app.py***.
 
-**app.py** contains the architecture of the app and its different routes.
+***app.py*** contains the architecture of the app and its different routes.
 - `redirect_to_landing()` is a before_request route that ensures that a new user will be redirected to the `landing()` route
 - `landing()` creates a session for the new user and related entries into our database (`Userdata` and `Tempdata`)
 - `tutorial()` renders `tutorial.html`
