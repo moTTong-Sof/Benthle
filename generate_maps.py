@@ -1,3 +1,5 @@
+# generate_maps.py
+
 from app import app
 from helpers import get_map_boundaries, generate_url_and_colorscale, create_map_zones, min_max_depth_zones, get_url_image
 from models import Tempdata, Maps

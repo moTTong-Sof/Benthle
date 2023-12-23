@@ -1,7 +1,8 @@
+# helpers.py
+
 import random
 import requests
 import math
-import json
 
 import pandas as pd
 import numpy as np
@@ -11,7 +12,7 @@ from database import db
 
 def get_map_boundaries(db_boundaries, map_size=5):
     """
-    This function generate random boundaries for a square map.
+    Generates random boundaries for a square map.
 
     Arguments : 
     - db_boundaries : the geographical boundaries of our database
@@ -52,7 +53,7 @@ def get_map_boundaries(db_boundaries, map_size=5):
 
 def generate_url_and_colorscale(map_boundaries):
     """
-    This function will print a url for the map as a .png (with legend and axis) for checking purposes
+    Generates a url for the map as a .png (with legend and axis) for checking purposes
     and eventually to register them later in order to create a history for each player.
     It also create a .png url that isolate the colorscale so we can display it into game.html
     
@@ -60,6 +61,7 @@ def generate_url_and_colorscale(map_boundaries):
     - map_boundaries : a dict with min/max latitudes and longitudes of our map
 
     Return :
+    - url : the full url
     - colorscale : a url with only the colorscale
     
     """
@@ -89,7 +91,7 @@ def generate_url_and_colorscale(map_boundaries):
 
 def create_map_zones(map_boundaries, grid_width):
     """
-    This function will divide our map into zones accordingly to the difficulty chose by the player
+    Divides our map into zones accordingly to the difficulty chose by the player
 
     Arguments :
     - map_boundaries : a dict with the randomly generated boundaries
@@ -124,7 +126,7 @@ def create_map_zones(map_boundaries, grid_width):
 
 def get_erddap_data(zone):
     """
-    This function will fetch elevation datas from EMODnet's ERDDAP so we can identify the shallowest and deepest zones.
+    Fetches elevation datas from EMODnet's ERDDAP so we can identify the shallowest and deepest zones.
     Eventually, this could also be used so we could plot the data ourselves.
 
     Arguments :
@@ -165,7 +167,7 @@ def get_erddap_data(zone):
 
 def min_max_depth_zones(map_zones):
     """
-    This function will compare the min and max depth of each zones to determine which zone has the shallowest and the deepest point.
+    Compares the min and max depth of each zones to determine which zone has the shallowest and the deepest point.
 
     Arguments :
     - map_zones : a dict with all the zones indexes and boundaries
@@ -215,10 +217,12 @@ def min_max_depth_zones(map_zones):
 
 def check_playability(rows, elevation_threshold = 0.9):
     """
-    This function check for the playability of the map aka if there is enough "sea" in it to be played
+    Checks for the playability of the map aka if there is enough "sea" in it to be played
+
     Arguments : 
     - zone_data : data fetched from erddap
     - elevation_threshold : threshold for the percentage of elevations set to None (currently 90%)
+    
     Return : True or False
     """  
     total_points = len(rows)
@@ -229,9 +233,7 @@ def check_playability(rows, elevation_threshold = 0.9):
 
 def get_url_image(zone, min_depth, max_depth, round_increment=100):
     """
-    This function will print a url for the map as a .png (with legend and axis) for checking purposes
-    and eventually to register them later in order to create a history for each player.
-    It also create a .png url that isolate the colorscale so we can display it into game.html
+    Generates a url for the map as a .png (without legend and axis)
     
     Arguments : 
     - zone : a dict with an index and zone boundaries (a list)
@@ -266,11 +268,3 @@ def get_url_image(zone, min_depth, max_depth, round_increment=100):
     )
 
     return url
-
-
-def load_map_data(json_file_path, difficulty):
-    # Fetch the data stored in the json file created
-    print(difficulty)
-    with open(json_file_path, 'r') as f:
-        maps = json.load(f)
-    return maps.get(difficulty, {})

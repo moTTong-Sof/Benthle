@@ -1,3 +1,5 @@
+# app.py
+
 from flask import Flask, request, session, render_template, redirect, url_for, jsonify
 from database import db
 from config import DevelopmentConfig, ProductionConfig
@@ -140,8 +142,6 @@ def update_database():
             elif table_arg == 'Userdata':
                 instance = Userdata.query.filter_by(id=session['user_id']).first()
             elif table_arg == 'Historic':
-                # date_value = datetime.strptime(value, '%Y-%m-%d').strftime('%Y-%m-%d')
-                # print(date_value)
                 url = Maps.query.filter_by(difficulty_level=stat_name, day=value).first()
                 print(url)
                 user_historic = Historic(session['user_id'], value, stat_name, url.url)
