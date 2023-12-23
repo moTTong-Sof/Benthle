@@ -1,12 +1,17 @@
 # BENTHLE
-### Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
+
+## Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
+
 ### Description:
+Benthle is a web app that leverages bathymetric data from EMODnet to foster ocean literacy through a gamified experience.
 
-Benthle is a web app that leverages marine scientific data to foster ocean literacy through a gamified experience. In it's current state, it focuses more specifically towards bathymetry and how to read bathymetric maps. 
+This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0 Hackathon: as a non-scientist, my main goal was to turn scientific date more accessible to a wider public by turning it into a fun and seamless experience.
 
-Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty.  
+### How to play
+Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty. 
 
-#### Backend files
+## Code explanation
+### Backend files
 **config.py** defines environement variables such as `SECRET_KEY` and `DATABASE_URL`.
 
 **database.py**'s purpose is to import sqlachemy in one place only and then be able to call it wherever it is needed to avoid multiple `db`.
@@ -59,7 +64,7 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
     Return :
     - url : a url with only the data plotted in it
 
-**generate_maps.py** is where the magic operates by combining all the **helpers.py** functions into `generate_and_save_maps()`. Every time the function is called, it will generate 3 maps according to the 3 difficulties of the game and then stores all the elements gathered into our database table `Maps`. If a map (or more) is deemed not playable, it will rerun the function only for it. It also resets the whole `Tempdata` table to allow players to play again for the day. 
+**generate_maps.py** combines all the **helpers.py** functions into `generate_and_save_maps()`. Every time the function is called, it will generate 3 maps according to the 3 difficulties of the game and then stores all the elements gathered into our database table `Maps`. If a map (or more) is deemed not playable, it will rerun the function only for it. It also resets the whole `Tempdata` table to allow players to play again for the day. 
 
 **scheduler.py** schedules `generate_and_save_maps()` everyday at 0:00 UTC and is called in **app.py**.
 
@@ -67,16 +72,16 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
 - `redirect_to_landing()` is a before_request route that ensures that a new user will be redirected to the `landing()` route
 - `landing()` creates a session for the new user and related entries into our database (`Userdata` and `Tempdata`)
 - `tutorial()` renders `tutorial.html`
-- `homepage()` has `GET` & `POST` methods. GET method renders `homepage.html`. When a user clicks on a difficulty level, it will POST the difficulty has an argument and redirect to the `game()` route
-- `game()` is basically the default route to display the maps and is used as a "tampon" to call the `game_data()` for better UX. This way, I was able to put a loading screen while the images where fetched instead of having a blank page while all the data was gathered.
+- `homepage()` has `GET` & `POST` methods. `GET` method renders `homepage.html`. When a user clicks on a difficulty level, it will `POST` the difficulty has an argument and redirect to the `game()` route
+- `game()` is basically the default route to display the maps and is used as a transition to call the `game_data()` for better UX. This way, I was able to put a loading screen while the images where fetched instead of having a blank page while all the data was gathered.
 - `game_data()` is called first client side. Once on the server side, it fetches all the relevant informations from `Maps` and send them back client side as a json object.
-- `update_database()` has a `GET` and a `POST` method and is called client side. The GET method is used whenever the browser wants to acess specific data (such as statistical datas) and the POST method is used whenever the browser sends informations to update `Userdata`, `Tempdata` or `Historic` for the current user.
+- `update_database()` has a `GET` and a `POST` method and is called client side. The `GET` method is used whenever the browser wants to acess specific data (such as statistical datas) and the `POST` method is used whenever the browser sends informations to update `Userdata`, `Tempdata` or `Historic` for the current user.
 
-#### Frontend files
+### Frontend files
 
-#### Design choices
+### Design choices
 
-#### What's next ?
+### What's next ?
 
 what your project is, 
 what each of the files you wrote for the project contains and does,
