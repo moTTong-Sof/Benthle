@@ -3,7 +3,7 @@
 <p align="center"> <img src="static/images/benthle mini.png" width="50%"> </p>
 
 ## <p align="center">Description </p>
-Benthle is a web app that leverages bathymetric data from EMODnet @erddap to foster ocean literacy through a gamified experience.
+Benthle is a web app that leverages bathymetric data from EMODnet @ERDDAP to foster ocean literacy through a gamified experience.
 
 This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0 Hackathon: as a non-scientist, my main goal was to turn scientific date more accessible to a wider public by turning it into a fun and seamless experience.
 
