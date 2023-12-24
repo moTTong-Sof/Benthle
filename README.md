@@ -1,9 +1,8 @@
 # <p align="center"> BENTHLE </p>
 
-<p align="center"> <img src="static/images/benthle_mini.png" width="50%"> </p>
+<p align="center"> <img src="static/images/benthle mini.png" width="50%"> </p>
 
-## Video presentation: 
-<p align="center"> <img src="static/images/benthle_mini.png" width="50%">(https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra "Benthle presentation") </p>
+## Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
 
 ### Description:
 Benthle is a web app that leverages bathymetric data from EMODnet to foster ocean literacy through a gamified experience.
