@@ -2,7 +2,7 @@
 
 <p align="center"> <img src="static/images/benthle mini.png" width="50%"> </p>
 
-## Description:
+## <p align="center">Description </p>
 Benthle is a web app that leverages bathymetric data from EMODnet @erddap to foster ocean literacy through a gamified experience.
 
 This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0 Hackathon: as a non-scientist, my main goal was to turn scientific date more accessible to a wider public by turning it into a fun and seamless experience.
@@ -16,7 +16,7 @@ You start with 5 attempts. Each time you flip a tile, you loose 1 attempt. Remai
 
 **Benthic wisdom**: When you flip a tile that is 1 tile away from the deepest or the shallowest point, a yellow flash will appear.
 
-## Code explanation
+## <p align="center">Code explanation</p>
 ### Backend files
 ***config.py*** defines environement variables such as `SECRET_KEY` and `DATABASE_URL`.
 
@@ -107,5 +107,5 @@ At first, I was willing to plot the data myself but wasn't satisfied by the resu
 
 After some reasearch about @erddap, I realised it was possible to generate urls that would render transparent png so I decided to use the graphs of the platform for an easier 
 
-### What's next ?
+## <p align="center">What's next ?</p>
 
