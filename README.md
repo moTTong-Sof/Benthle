@@ -3,20 +3,18 @@
 <p align="center"> <img src="static/images/benthle mini.png" width="50%"> </p>
 
 ## Description:
-Benthle is a web app that leverages bathymetric data from EMODnet to foster ocean literacy through a gamified experience.
+Benthle is a web app that leverages bathymetric data from EMODnet @erddap to foster ocean literacy through a gamified experience.
 
 This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0 Hackathon: as a non-scientist, my main goal was to turn scientific date more accessible to a wider public by turning it into a fun and seamless experience.
 
 ### Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
 
 ### How to play
-BENTHLE has two main objectives: finding the **deepest** AND the **shallowest** point on the map.
+BENTHLE has two main objectives: finding the **deepest** AND the **shallowest** point on the map. Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty. 
 
 You start with 5 attempts. Each time you flip a tile, you loose 1 attempt. Remaining attempts are transfered to the next difficulty level.
 
 **Benthic wisdom**: When you flip a tile that is 1 tile away from the deepest or the shallowest point, a yellow flash will appear.
-
-Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty. 
 
 ## Code explanation
 ### Backend files
@@ -37,7 +35,7 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
     - map_size : size of the map we want to display in percentage
     Return :
     - map_boundaries : a dict with min/max latitudes and longitudes
-- `generate_url_and_colorscale()` prints a url for the map as a .png (with legend and axis) for checking purposes and a .png url that isolate the colorscale
+- `generate_url_and_colorscale()` generates a url for the map as a .png (with legend and axis) for checking purposes and a .png url that isolate the colorscale by sending a query to @erddap EMODnet
     Arguments : 
     - map_boundaries : a dict with min/max latitudes and longitudes of our map
     Return :
@@ -49,7 +47,7 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
     - grid_width : the size of the grid according to the difficulty chosen by the player
     Return :
     - zones : a list of dictionnaries with an index and each zone boundaries (a list)
-- `get_erddap_data()` fetches elevation datas from EMODnet's ERDDAP so we can identify the shallowest and deepest zones. Eventually, it could also be used so we could plot the data ourselves.
+- `get_erddap_data()` fetches elevation datas from EMODnet's @erddap so we can identify the shallowest and deepest zones. Eventually, it could also be used so we could plot the data ourselves.
     Arguments :
     - zone : a dict with an index and zone boundaries (a list)
     Return :
@@ -104,12 +102,10 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
 
 ***games.js*** contains all the functions allowing the interactions in our game such as displaying the starting tiles, fliping the tiles, recognizing the nature of the tile, our "benthic wisdom" feature that allow the user to understand if the tile clicked is in a 1-tile range from a correct one, updating the stats, etc.
 
-### Design choices
+### Difficulties & design choices
+At first, I was willing to plot the data myself but wasn't satisfied by the result of common data visualization python libraries. Graphically, it felt _very scientific_ and the idea was to turn the data more appealing, not only in the way it was accessed but visually. 
+
+After some reasearch about @erddap, I realised it was possible to generate urls that would render transparent png so I decided to use the graphs of the platform for an easier 
 
 ### What's next ?
-
-what your project is, 
-what each of the files you wrote for the project contains and does,
-and if you debated certain design choices, 
-explaining why you made them. 
 
