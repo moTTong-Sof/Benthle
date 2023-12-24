@@ -7,7 +7,7 @@ Benthle is a web app that leverages bathymetric data from EMODnet @erddap to fos
 
 This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0 Hackathon: as a non-scientist, my main goal was to turn scientific date more accessible to a wider public by turning it into a fun and seamless experience.
 
-### <p align="center">Video presentation: [CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)</p>
+### <p align="center">[Video presentation](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)</p>
 
 ### How to play
 BENTHLE has two main objectives: finding the **deepest** AND the **shallowest** point on the map. Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty. 
