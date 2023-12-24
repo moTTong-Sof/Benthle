@@ -10,6 +10,12 @@ This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0
 ### Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
 
 ### How to play
+BENTHLE has two main objectives: finding the **deepest** AND the **shallowest** point on the map.
+
+You start with 5 attempts. Each time you flip a tile, you loose 1 attempt. Remaining attempts are transfered to the next difficulty level.
+
+**Benthic wisdom**: When you flip a tile that is 1 tile away from the deepest or the shallowest point, a yellow flash will appear.
+
 Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty. 
 
 ## Code explanation
@@ -92,7 +98,7 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
 
 ***fetchMapData.js*** contains the function responsible for fetching all the informations needed to display each map into our `game.html`, namely the deepest and the shallowest zones, the size of the map, etc. It is also responsible or creating the map/grid in our html file.
 
-***fetchTables.js*** contains both functions that allows to query our database from the client side. One with a `GET` method if we want to access information to display it and one with a `POST` if we want to insert data in it. Both takes 2 arguments :
+***fetchTables.js*** contains both functions that allow us to query our database from the client side. One with a `GET` method if we want to access information to display it and one with a `POST` if we want to insert data in it. Both takes 2 arguments :
 - a stat or value : the one we want to `GET` or `POST` 
 - a table : the one we want to access, `Maps` or `Historic` for example. 
 
