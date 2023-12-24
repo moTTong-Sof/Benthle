@@ -2,12 +2,12 @@
 
 <p align="center"> <img src="static/images/benthle mini.png" width="50%"> </p>
 
-## Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
-
-### Description:
+## Description:
 Benthle is a web app that leverages bathymetric data from EMODnet to foster ocean literacy through a gamified experience.
 
 This idea emerged when I participated 1 year ago to the EMODnet Open Sea Lab 3.0 Hackathon: as a non-scientist, my main goal was to turn scientific date more accessible to a wider public by turning it into a fun and seamless experience.
+
+### Video presentation: <[CLICK HERE](https://www.youtube.com/watch?v=7xxuVlqfn6Q&ab_channel=SofianeFarhra)>
 
 ### How to play
 Every day, users will have to grind their way throughout 3 maps, each of them representing a certain degree of difficulty. 
@@ -80,6 +80,23 @@ Every day, users will have to grind their way throughout 3 maps, each of them re
 - `update_database()` has a `GET` and a `POST` method and is called client side. The `GET` method is used whenever the browser wants to acess specific data (such as statistical datas) and the `POST` method is used whenever the browser sends informations to update `Userdata`, `Tempdata` or `Historic` for the current user.
 
 ### Frontend files
+***landing.js*** is responsible for the animation of the logo when arriving on the site for the first time and when the user leaves the tutorial
+
+***navInteraction.js*** is responsible for the dynamic pop-ups of the navigation bar (homepage, rules, statistics and map's collection). It also fetches dynamically the informations needed for to display the player's statistics and map's collection.
+
+***buttonInteraction.js*** dynamically displays which difficulty levels are available depending on the daily progression of the user. It ensures no one can do the same level twice and is supported by ***accessDifficultyControl.js*** to grant or prohibit access to higher levels.
+
+***loadinglogic.js*** manages the animation displayed when loading the maps or the tutorial.
+
+***tuto.js*** contains all the logic of the tutorial (progression bar, drag & drop functions, etc.)
+
+***fetchMapData.js*** contains the function responsible for fetching all the informations needed to display each map into our `game.html`, namely the deepest and the shallowest zones, the size of the map, etc. It is also responsible or creating the map/grid in our html file.
+
+***fetchTables.js*** contains both functions that allows to query our database from the client side. One with a `GET` method if we want to access information to display it and one with a `POST` if we want to insert data in it. Both takes 2 arguments :
+- a stat or value : the one we want to `GET` or `POST` 
+- a table : the one we want to access, `Maps` or `Historic` for example. 
+
+***games.js*** contains all the functions allowing the interactions in our game such as displaying the starting tiles, fliping the tiles, recognizing the nature of the tile, our "benthic wisdom" feature that allow the user to understand if the tile clicked is in a 1-tile range from a correct one, updating the stats, etc.
 
 ### Design choices
 
