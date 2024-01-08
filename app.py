@@ -169,8 +169,8 @@ def update_database():
         return jsonify(response)
 
     
-from scheduler import scheduled_maps
-scheduled_maps()
+# from scheduler import scheduled_maps
+# scheduled_maps()
 
 
 if __name__ == '__main__':

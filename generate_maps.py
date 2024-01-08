@@ -24,7 +24,6 @@ DB_BOUNDARIES = {
 valid_difficulties = ['bathyal', 'abyssal', 'hadal']
 """ Global variables """
 
-
 def generate_and_save_maps(difficulties_to_rerun=None):
 
      with app.app_context():
@@ -122,3 +121,5 @@ def generate_and_save_maps(difficulties_to_rerun=None):
 
         if difficulties_to_rerun:
             return generate_and_save_maps(difficulties_to_rerun)
+
+generate_and_save_maps()
